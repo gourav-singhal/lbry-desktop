@@ -1,25 +1,30 @@
+// @if TARGET='app'
 import { clipboard, remote } from 'electron';
 import isDev from 'electron-is-dev';
+// @endif
+// @if TARGET='web'
+// import { remote, isDev } from 'web/stubs';
+// @endif
 
-function injectDevelopmentTemplate(event, templates) {
-  if (!isDev) return templates;
-  const { screenX, screenY } = event;
-  const separator = { type: 'separator' };
-  const developmentTemplateAddition = [
-    {
-      label: 'Inspect element',
-      accelerator: 'CmdOrCtrl+Shift+I',
-      click: () => {
-        remote.getCurrentWindow().inspectElement(screenX, screenY);
-      },
-    },
-  ];
-  if (templates.length > 0) {
-    templates.push(separator);
-  }
-  templates.push(...developmentTemplateAddition);
-  return templates;
-}
+// function injectDevelopmentTemplate(event, templates) {
+//   if (!isDev) return templates;
+//   const { screenX, screenY } = event;
+//   const separator = { type: 'separator' };
+//   const developmentTemplateAddition = [
+//     {
+//       label: 'Inspect element',
+//       accelerator: 'CmdOrCtrl+Shift+I',
+//       click: () => {
+//         remote.getCurrentWindow().inspectElement(screenX, screenY);
+//       },
+//     },
+//   ];
+//   if (templates.length > 0) {
+//     templates.push(separator);
+//   }
+//   templates.push(...developmentTemplateAddition);
+//   return templates;
+// }
 
 export function openContextMenu(event, templates = [], canEdit = false, selection = '') {
   const { type, value } = event.target;

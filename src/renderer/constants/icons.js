@@ -44,3 +44,5 @@ export const FILE = 'File';
 export const OPTIONS = 'Sliders';
 export const YES = 'ThumbsUp';
 export const NO = 'ThumbsDown';
+export const SECURE = 'Lock';
+export const MENU = 'Menu';

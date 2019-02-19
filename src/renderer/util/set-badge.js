@@ -1,3 +1,4 @@
+// @if TARGET='app'
 import { remote } from 'electron';
 
 const application = remote.app;
@@ -11,3 +12,4 @@ const setBadge = text => {
 };
 
 export default setBadge;
+// @endif

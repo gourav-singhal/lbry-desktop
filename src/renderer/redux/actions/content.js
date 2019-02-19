@@ -61,13 +61,10 @@ export function doUpdateLoadStatus(uri: string, outpoint: string) {
           },
         });
 
+        // @if TARGET='app'
         const badgeNumber = selectBadgeNumber(state);
         setBadge(badgeNumber === 0 ? '' : `${badgeNumber}`);
-
-        // Disabling this for now because it's confusing for new users that don't realize files are actually being downloaded
-        // This should move inside of the app
-        // const totalProgress = selectTotalDownloadProgress(state);
-        // setProgressBar(totalProgress);
+        // @endif
 
         const channelUri = makeSelectChannelForClaimUri(uri, true)(state);
         const { claimName: channelName } = parseURI(channelUri);
@@ -120,8 +117,6 @@ export function doUpdateLoadStatus(uri: string, outpoint: string) {
           },
         });
 
-        // const totalProgress = selectTotalDownloadProgress(getState());
-        // setProgressBar(totalProgress);
         setNextStatusUpdate();
       }
     });

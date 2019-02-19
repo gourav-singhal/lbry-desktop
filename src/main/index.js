@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 // Module imports
+// @if TARGET='app'
 import keytar from 'keytar';
 import SemVer from 'semver';
 import url from 'url';
@@ -13,6 +14,8 @@ import createTray from './createTray';
 import createWindow from './createWindow';
 import pjson from '../../package.json';
 import startSandbox from './startSandbox';
+
+console.log('APP????????????????????????');
 
 autoUpdater.autoDownload = true;
 
@@ -99,10 +102,12 @@ app.on('ready', async () => {
   if (isDev) {
     await installExtensions();
   }
+
   rendererWindow = createWindow(appState);
   rendererWindow.webContents.on('devtools-opened', () => {
     rendererWindow.webContents.send('devtools-is-opened');
   });
+
   tray = createTray(rendererWindow);
   // HACK: patch webrequest to fix devtools incompatibility with electron 2.x.
   // See https://github.com/electron/electron/issues/13008#issuecomment-400261941
@@ -292,7 +297,8 @@ process.on('uncaughtException', error => {
 });
 
 // Force single instance application
-const isSecondInstance = app.makeSingleInstance(argv => {
+app.requestSingleInstanceLock();
+app.on('second-instance', (event, argv) => {
   if (rendererWindow) {
     if (
       (process.platform === 'win32' || process.platform === 'linux') &&
@@ -320,7 +326,8 @@ const isSecondInstance = app.makeSingleInstance(argv => {
     rendererWindow.show();
   }
 });
+// @endif
 
-if (isSecondInstance) {
-  app.exit();
-}
+// @if TARGET='web'
+console.log('WEB????');
+// @endif

@@ -1,6 +1,10 @@
-/* eslint-disable */
 import React from 'react';
+// @if TARGET='app'
 import { remote } from 'electron';
+// @endif
+// @if TARGET='web'
+import { remote } from 'web/stubs';
+// @endif
 import fs from 'fs';
 import path from 'path';
 import player from 'render-media';
@@ -9,10 +13,28 @@ import FileRender from 'component/fileRender';
 import Thumbnail from 'component/common/thumbnail';
 import LoadingScreen from 'component/common/loading-screen';
 
+// Handle fullscreen change for the Windows platform
+const win32FullScreenChange = () => {
+  const win = remote.BrowserWindow.getFocusedWindow();
+  if (process.platform === 'win32') {
+    win.setMenu(document.webkitIsFullScreen ? null : remote.Menu.getApplicationMenu());
+  }
+};
+
 class MediaPlayer extends React.PureComponent {
   static MP3_CONTENT_TYPES = ['audio/mpeg3', 'audio/mpeg'];
   static SANDBOX_TYPES = ['application/x-lbry', 'application/x-ext-lbry'];
   static FILE_MEDIA_TYPES = ['text', 'script', 'e-book', 'comic-book', 'document', '3D-file'];
+  // static FILE_MEDIA_TYPES = [
+  //   'video',
+  //   'audio',
+  //   'text',
+  //   'script',
+  //   'e-book',
+  //   'comic-book',
+  //   'document',
+  //   '3D-file',
+  // ];
   static SANDBOX_SET_BASE_URL = 'http://localhost:5278/set/';
   static SANDBOX_CONTENT_BASE_URL = 'http://localhost:5278';
 
@@ -26,15 +48,8 @@ class MediaPlayer extends React.PureComponent {
       fileSource: null,
     };
 
-    this.togglePlayListener = this.togglePlay.bind(this);
-    this.toggleFullScreenVideo = this.toggleFullScreen.bind(this);
-  }
-
-  componentDidUpdate(nextProps) {
-    const el = this.refs.media.children[0];
-    if (this.props.playingUri && !nextProps.playingUri && !el.paused) {
-      el.pause();
-    }
+    // this.togglePlayListener = this.togglePlay.bind(this);
+    // this.toggleFullScreenVideo = this.toggleFullScreen.bind(this);
   }
 
   componentDidMount() {
@@ -113,30 +128,18 @@ class MediaPlayer extends React.PureComponent {
       });
       mediaElement.volume = volume;
       mediaElement.addEventListener('dblclick', this.toggleFullScreenVideo);
+
+      // if (this.isSupportedFile()) {
+      //   this.renderFile();
+      // }
     }
   }
 
-  componentWillReceiveProps(next) {
-    const el = this.media.children[0];
-    if (!this.props.paused && next.paused && !el.paused) el.pause();
-  }
-
   componentDidUpdate() {
-    const { contentType, downloadCompleted } = this.props;
-    const { startedPlaying, fileSource } = this.state;
+    const { fileName, downloadPath, contentType } = this.props;
+    const { fileSource } = this.state;
 
-    if (this.playableType() && !startedPlaying && downloadCompleted) {
-      const container = this.media.children[0];
-
-      if (MediaPlayer.MP3_CONTENT_TYPES.indexOf(contentType) > -1) {
-        this.renderAudio(this.media, true);
-      } else {
-        player.render(this.file(), container, {
-          autoplay: true,
-          controls: true,
-        });
-      }
-    } else if (this.fileType() && !fileSource && downloadCompleted) {
+    if (!fileSource && fileName && downloadPath && contentType) {
       this.renderFile();
     }
   }
@@ -235,16 +238,14 @@ class MediaPlayer extends React.PureComponent {
       contentType,
       downloadPath,
       fileType: path.extname(fileName).substring(1),
+      // // Readable stream from file
+      stream: opts => fs.createReadStream(downloadPath, opts),
     };
-
-    // Readable stream from file
-    fileSource.stream = opts => fs.createReadStream(downloadPath, opts);
 
     // Blob url from stream
     fileSource.blob = callback =>
       toBlobURL(fs.createReadStream(downloadPath), contentType, callback);
 
-    // Update state
     this.setState({ fileSource });
   }
 
@@ -310,15 +311,13 @@ class MediaPlayer extends React.PureComponent {
 
     const isFileType = this.fileType();
     const isFileReady = fileSource && isFileType;
-    const isPlayableType = this.playableType();
-    const { isLoading, loadingStatus } = this.showLoadingScreen(isFileType, isPlayableType);
 
     return (
       <React.Fragment>
         {loadingStatus && <LoadingScreen status={loadingStatus} spinner={isLoading} />}
         {isFileReady && <FileRender source={fileSource} mediaType={mediaType} />}
         <div
-          className={'content__view--container'}
+          className="content__view--container"
           style={{ opacity: isLoading ? 0 : 1 }}
           ref={container => {
             this.media = container;
@@ -330,4 +329,3 @@ class MediaPlayer extends React.PureComponent {
 }
 
 export default MediaPlayer;
-/* eslint-disable */
