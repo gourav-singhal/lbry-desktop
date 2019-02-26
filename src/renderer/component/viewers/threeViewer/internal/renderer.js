@@ -1,4 +1,4 @@
-import { WebGLRenderer } from './three';
+import { WebGLRenderer } from 'three-full';
 
 const ThreeRenderer = ({ antialias, shadowMap, gammaCorrection }) => {
   const renderer = new WebGLRenderer({ antialias });

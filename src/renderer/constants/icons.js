@@ -46,3 +46,5 @@ export const YES = 'ThumbsUp';
 export const NO = 'ThumbsDown';
 export const UP = 'ChevronUp';
 export const DOWN = 'ChevronDown';
+export const LOCK = 'Lock';
+export const MENU = 'Menu';

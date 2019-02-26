@@ -295,7 +295,9 @@ process.on('uncaughtException', error => {
 });
 
 // Force single instance application
-const isSecondInstance = app.makeSingleInstance(argv => {
+app.requestSingleInstanceLock();
+
+app.on('second-instance', (event, argv) => {
   if (rendererWindow) {
     if (
       (process.platform === 'win32' || process.platform === 'linux') &&
@@ -323,8 +325,4 @@ const isSecondInstance = app.makeSingleInstance(argv => {
     rendererWindow.show();
   }
 });
-
-if (isSecondInstance) {
-  app.exit();
-}
 // @endif

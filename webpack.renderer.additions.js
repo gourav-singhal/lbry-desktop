@@ -19,9 +19,6 @@ module.exports = {
           // This rule is temporarily necessary until https://github.com/electron-userland/electron-webpack/issues/60 is fixed.
           {
             loader: 'babel-loader',
-            options: {
-              presets: ['env', 'react', 'stage-2'],
-            },
           },
           {
             loader: 'preprocess-loader',

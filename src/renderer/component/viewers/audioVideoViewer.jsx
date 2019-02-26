@@ -44,6 +44,8 @@ class AudioVideoViewer extends React.PureComponent<Props> {
       sources,
     };
 
+    debugger;
+
     this.player = videojs(this.videoNode, videoJsOptions, () => {});
   }
 

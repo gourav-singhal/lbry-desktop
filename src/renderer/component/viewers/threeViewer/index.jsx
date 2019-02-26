@@ -5,12 +5,41 @@ import classNames from 'classnames';
 import LoadingScreen from 'component/common/loading-screen';
 
 // ThreeJS
-import * as THREE from './internal/three';
+import * as THREE from 'three-full';
 import detectWebGL from './internal/detector';
 import ThreeGrid from './internal/grid';
 import ThreeScene from './internal/scene';
-import ThreeLoader from './internal/loader';
 import ThreeRenderer from './internal/renderer';
+
+const Manager = ({ onLoad, onStart, onError }) => {
+  const manager = new THREE.LoadingManager();
+  manager.onLoad = onLoad;
+  manager.onStart = onStart;
+  manager.onError = onError;
+
+  return manager;
+};
+
+const Loader = (fileType, manager) => {
+  const fileTypes = {
+    stl: () => new THREE.STLLoader(manager),
+    obj: () => new THREE.OBJLoader2(manager),
+  };
+  return fileTypes[fileType] ? fileTypes[fileType]() : null;
+};
+
+const ThreeLoader = ({ fileType = null, downloadPath = null }, renderModel, managerEvents) => {
+  if (fileType && downloadPath) {
+    const manager = Manager(managerEvents);
+    const loader = Loader(fileType, manager);
+
+    if (loader) {
+      loader.load(`file://${downloadPath}`, data => {
+        renderModel(fileType, data);
+      });
+    }
+  }
+};
 
 type viewerTheme = {
   gridColor: string,
